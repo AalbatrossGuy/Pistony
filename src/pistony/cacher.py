@@ -8,12 +8,15 @@ from collections.abc import Callable, Hashable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Generic, TypeAlias, TypeVar
 
+from typing_extensions import Self
+
 K = TypeVar("K")
 V = TypeVar("V")
 _sentry = object()
 
 JsonScalar: TypeAlias = str | int | float | bool | None
-JsonLike: TypeAlias = JsonScalar | Mapping[str, "JsonLike"] | Sequence["JsonLike"]
+JsonLike: TypeAlias = JsonScalar | Mapping[str,
+                                           "JsonLike"] | Sequence["JsonLike"]
 
 
 @dataclass
@@ -31,12 +34,12 @@ def _time_now() -> float:
 def default_key_builder(
     objct: JsonLike | Hashable
 ) -> str:
-    if isinstance(objct, (str, int, float, bool, type(None))):
+    if isinstance(objct, str | int | float | bool | None):
         return str(objct)
 
     if isinstance(objct, tuple) and \
         all(
-        isinstance(x, (str, int, float, bool, type(None)))
+        isinstance(x, str | int | float | bool | None)
         for x in objct
     ):
         return str(objct)
@@ -53,7 +56,7 @@ def default_key_builder(
 
 class PistonyCacher(Generic[K, V]):
     def __init__(
-        self,
+        self: Self,
         default_ttl: float = 350.0,
         max_size: int = 1024,
         swr: bool = False,
@@ -73,27 +76,33 @@ class PistonyCacher(Generic[K, V]):
         self._key_locks: dict[K, threading.Lock] = {}
         self.cache_stats = PistonyCache
 
-    def __len__(self) -> int:
+    def __len__(self: Self) -> int:
         with self._threadlock:
             return len(self._store_cache)
 
-    def __contains__(self, key: K) -> bool:
+    def __contains__(self: Self, key: K) -> bool:
         return self.fetch_fresh_cache(key) is not None
 
-    def clear_cache(self) -> None:
+    def clear_cache(self: Self) -> None:
         with self._threadlock:
             self._store_cache.clear()
             self._key_locks.clear()
 
-    def delete_cache(self, data_key: K) -> None:
+    def delete_cache(self: Self, data_key: K) -> None:
         with self._threadlock:
             if data_key in self._store_cache:
                 del self._store_cache[data_key]
 
     def set_cache(
-        self,
+        self: Self,
         key: K,
         value: V | None,
         cache_ttl: float | None = None
     ) -> None:
+        pass
+
+    def fetch_fresh_cache(
+        self: Self,
+        key: K
+    ) -> V | None:
         pass
