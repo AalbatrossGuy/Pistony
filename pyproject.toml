@@ -48,8 +48,7 @@ packages = ["src/pistony"]
 [tool.ruff]
 line-length = 100
 target-version = "py39"
-select = ["E","F","I","B","UP","ANN","C4"]
-ignore = ["ANN101","ANN102"]
+lint.select = ["E","F","I","B","UP","ANN","C4"]
 
 [tool.mypy]
 python_version = "3.9"
