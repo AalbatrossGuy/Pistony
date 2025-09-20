@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import json
-import time
 import threading
-from dataclasses import dataclass
+import time
 from collections import OrderedDict
-from typing import Any, Callable, Dict, Generic, Optional, Tuple, TypeVar
+from dataclasses import dataclass
+from typing import Any, Callable, Generic, Optional, TypeVar
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -25,7 +25,7 @@ def _time_now() -> float:
 
 
 def default_key_builder(
-        objct: Any
+        objct
 ) -> str:
     try:
         return json.dumps(
@@ -54,10 +54,10 @@ class PistonyCacher(Generic[K, V]):
         self._negative_caching = negative_caching
         self._store_cache: OrderedDict[
             K,
-            Tuple[float, float, Any]
+            tuple[float, float, Any]
         ] = OrderedDict()
         self._threadlock = threading.RLock()
-        self._key_locks: Dict[K, threading.Lock] = {}
+        self._key_locks: dict[K, threading.Lock] = {}
         self.cache_stats = PistonyCache
 
     def __len__(self) -> int:
@@ -80,7 +80,7 @@ class PistonyCacher(Generic[K, V]):
     def set_cache(
         self,
         key: K,
-        value: Optional[V],
-        cache_ttl: Optional[float] = None
-    ):
+        value: V | None,
+        cache_ttl: float | None = None
+    ) -> None:
         pass
