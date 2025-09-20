@@ -4,12 +4,19 @@ import json
 import threading
 import time
 from collections import OrderedDict
+from collections.abc import Hashable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Callable, Generic, Optional, TypeVar
+from typing import Any, Callable, Generic, TypeAlias, TypeVar, Union
 
 K = TypeVar("K")
 V = TypeVar("V")
 _sentry = object()
+
+JsonScalar: TypeAlias = Union[str, int, float, bool, None]
+JsonLike: TypeAlias = Union[
+    JsonScalar, Mapping[str, "JsonLike"], Sequence["JsonLike"]
+]
+# Keyable: TypeAlias = Union[JSONLike, Hashable]
 
 
 @dataclass
@@ -25,8 +32,17 @@ def _time_now() -> float:
 
 
 def default_key_builder(
-        objct
+    objct: JsonLike | Hashable
 ) -> str:
+    if isinstance(objct, (str, int, float, bool, type(None))):
+        return str(objct)
+
+    if isinstance(objct, tuple) and \
+        all(
+        isinstance(x, (str, int, float, bool, type(None)))
+        for x in objct
+    ):
+        return str(objct)
     try:
         return json.dumps(
             objct,
